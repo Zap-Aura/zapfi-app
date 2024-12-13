@@ -1,39 +1,43 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import '@/shared/plugins/crypto';
+import { useStorageValues } from '@/hooks';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useCallback, useEffect, useState } from 'react';
+import Storage from '@/shared/adapters/storage';
+import { UserInactivityProvider } from '@/providers';
+import '../global.css';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+    const [shouldRenderApp, setShouldRenderApp] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    useEffect(() => {
+        (async function () {
+            try {
+                const pairs = await new Storage().loadValues();
+                if (pairs) useStorageValues.setState(pairs);
+            } finally {
+                setShouldRenderApp(true);
+            }
+        })();
+    }, []);
 
-  if (!loaded) {
-    return null;
-  }
+    const onLayoutRootView = useCallback(() => {
+        if (shouldRenderApp) SplashScreen.hide();
+    }, [shouldRenderApp]);
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    if (!shouldRenderApp) return null;
+
+    return (
+        <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+            <UserInactivityProvider>
+                <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="index" />
+                </Stack>
+            </UserInactivityProvider>
+        </GestureHandlerRootView>
+    );
 }
