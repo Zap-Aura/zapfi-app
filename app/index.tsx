@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { EphemeralKeyPair } from '@aptos-labs/ts-sdk';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -14,6 +14,11 @@ import aptos from '@/shared/adapters/aptos';
 import { useStorageValues } from '@/hooks';
 import Storage from '@/shared/adapters/storage';
 import { storeKeylessAccount } from '@/shared/keyless';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Entypo from '@expo/vector-icons/Entypo';
+import { Logo } from '@/components';
+import { Colors } from '@/constants';
+import { router } from 'expo-router';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -88,25 +93,52 @@ const Page = () => {
                     storeKeylessAccount(keylessAccount),
                 ]);
 
-                // redirect to dashboard here
-                // other states will be updated too for this to take effect
+                router.push('/(onboard)');
             }
-        } catch (e) {
+        } catch (e: any) {
+            Alert.alert(e.message || 'Unable to complete request!');
+            console.error(e);
         } finally {
             setIsLoading(false);
         }
     }
 
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <Text>Edit app/index.tsx to edit this screen.</Text>
-        </View>
+        <SafeAreaView className="bg-background flex-1 items-center justify-between py-3">
+            <View className="flex w-full px-5 h-[80vh] items-center justify-center">
+                <View className="mb-10">
+                    <Logo />
+                </View>
+
+                <TouchableOpacity
+                    onPress={() => {
+                        setIsLoading(true);
+                        promptAsync();
+                    }}
+                    disabled={isLoading}
+                    className="w-full flex flex-row items-center justify-center border border-gray-600 rounded-full py-7 gap-3"
+                >
+                    {isLoading ? (
+                        <Text className="text-white font-geistmono-regular text-[17px]">
+                            Loading...
+                        </Text>
+                    ) : (
+                        <>
+                            <Entypo name="google-" size={22} color={Colors.Tertiary} />
+                            <Text className="text-white font-geistmono-regular text-[17px]">
+                                Continue with Google
+                            </Text>
+                        </>
+                    )}
+                </TouchableOpacity>
+            </View>
+
+            <View className="flex flex-row items-center gap-3">
+                <View className="w-8 h-[1px] bg-gray-500" />
+                <Text className="text-white text-lg font-geistmono-semi-bold">Built for Aptos</Text>
+                <View className="w-8 h-[1px] bg-gray-500" />
+            </View>
+        </SafeAreaView>
     );
 };
 

@@ -1,4 +1,4 @@
-import { View, Text, Platform } from 'react-native';
+import { View, Text } from 'react-native';
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Colors } from '@/constants';
@@ -12,9 +12,17 @@ type TabIconProps = {
 
 const TabIcon = ({ iconName, name, focused }: TabIconProps) => {
     return (
-        <View className="items-center justify-center">
-            <Feather name={iconName as any} size={24} color={focused ? Colors.Secondary : '#fff'} />
-            <Text className={`${focused ? 'text-secondary' : ''} text-xs mt-1`}>{name}</Text>
+        <View
+            className={`items-center justify-center w-14 h-14 rounded-full ${
+                focused ? 'border border-secondary' : ''
+            }`}
+        >
+            <Feather name={iconName as any} size={18} color={focused ? Colors.Secondary : '#fff'} />
+            {focused ? null : (
+                <Text className="text-gray-300 font-geistmono-regular text-[12px] text-center w-full mt-1.5">
+                    {name}
+                </Text>
+            )}
         </View>
     );
 };
@@ -26,8 +34,9 @@ const TabsLayout = () => {
                 tabBarShowLabel: false,
                 tabBarActiveTintColor: Colors.Secondary,
                 tabBarStyle: {
-                    backgroundColor: '#fff',
-                    height: Platform.OS === 'android' ? 70 : 85,
+                    backgroundColor: Colors.Background,
+                    borderTopWidth: 0,
+                    height: 70,
                 },
             }}
         >
@@ -59,7 +68,7 @@ const TabsLayout = () => {
                     title: 'Transactions',
                     headerShown: false,
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon iconName="refresh-cw" focused={focused} name="Transactions" />
+                        <TabIcon iconName="refresh-cw" focused={focused} name="Txs" />
                     ),
                 }}
             />
@@ -70,7 +79,7 @@ const TabsLayout = () => {
                     title: 'Browser',
                     headerShown: false,
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon iconName="globe" focused={focused} name="Browser" />
+                        <TabIcon iconName="globe" focused={focused} name="Web" />
                     ),
                 }}
             />

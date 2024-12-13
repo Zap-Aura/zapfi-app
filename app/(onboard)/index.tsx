@@ -1,56 +1,20 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { useStorageValues } from '@/hooks';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSequence,
-    withTiming,
-} from 'react-native-reanimated';
+import { TouchableOpacity } from 'react-native';
+import Storage from '@/shared/adapters/storage';
+import { router } from 'expo-router';
+import { useStorageValues } from '@/hooks';
 
 const Page = () => {
     const [code, setCode] = useState<number[]>([]);
     const length = Array(4).fill(0);
 
-    const offset = useSharedValue(0);
-    const style = useAnimatedStyle(() => {
-        return {
-            transform: [{ translateX: offset.value }],
-        };
-    });
-
-    const OFFSET = 20;
-    const TIME = 80;
-
     useEffect(() => {
-        const pin = useStorageValues.getState().pin;
-
-        if (code.length === 4) {
-            if (!pin) return router.push('/(tabs)/home');
-            else {
-                const passcode = code.join('');
-                if (passcode === pin) {
-                    router.push('/(tabs)/home');
-                    setCode([]);
-
-                    return;
-                } else {
-                    offset.value = withSequence(
-                        withTiming(-OFFSET, { duration: TIME / 2 }),
-                        withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true)
-                    );
-
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-                    setCode([]);
-                }
-            }
-        }
-    }, [code]);
+        if (useStorageValues.getState().pin) return router.push('/(tabs)/home');
+    }, []);
 
     const onNumberPress = (number: number) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -62,17 +26,27 @@ const Page = () => {
         setCode(code.slice(0, -1));
     };
 
+    useEffect(() => {
+        async function registerPIN(pin: string) {
+            await new Storage().setPair('pin', pin);
+            setCode([]);
+            router.push('/(tabs)/home');
+        }
+
+        if (code.length === 4) {
+            const pin = code.join('');
+            registerPIN(pin);
+        }
+    }, [code]);
+
     return (
         <SafeAreaView className="bg-background h-full py-10 px-5 flex-col justify-between">
             <Text className="text-white text-center font-geistmono-bold text-lg mt-10">
-                Enter 4-digit Passcode
+                Setup 4-digit Passcode
             </Text>
 
             <View>
-                <Animated.View
-                    style={style}
-                    className="flex-row items-center justify-center gap-4 mb-20"
-                >
+                <View className="flex-row items-center justify-center gap-4 mb-20">
                     {length.map((_, idx) => (
                         <View
                             className={`w-5 h-5 rounded-full ${
@@ -81,7 +55,7 @@ const Page = () => {
                             key={idx}
                         />
                     ))}
-                </Animated.View>
+                </View>
 
                 <View className="w-full flex-col gap-5">
                     <View className="flex-row items-center justify-around">

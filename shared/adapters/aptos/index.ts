@@ -4,7 +4,7 @@ import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
 export default (function () {
     let network;
 
-    switch (useStorageValues().network) {
+    switch (useStorageValues.getState().network) {
         case 'mainnet':
             network = Network.MAINNET;
 

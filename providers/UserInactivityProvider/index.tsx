@@ -21,13 +21,14 @@ const UserInactivityProvider = ({ children }: any) => {
             if (router.canGoBack()) router.back();
         }
 
-        if (!useStorageValues.getState().pin) return;
-
-        if (state === 'background') {
-            recordStartTime();
-        } else if (state === 'active' && appState.current.match(/background/)) {
-            const elapsed = Date.now() - Number(useStorageValues.getState().appLastInactive || 0);
-            if (elapsed >= 3000) router.push('/(auth)/lock');
+        if (useStorageValues.getState().pin) {
+            if (state === 'background') {
+                recordStartTime();
+            } else if (state === 'active' && appState.current.match(/background/)) {
+                const elapsed =
+                    Date.now() - Number(useStorageValues.getState().appLastInactive || 0);
+                if (elapsed >= 0) router.replace('/(auth)/lock');
+            }
         }
 
         appState.current = state;
