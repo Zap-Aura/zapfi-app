@@ -15,7 +15,7 @@ export default (function () {
             network = Network.DEVNET;
 
         default:
-            network = Network.TESTNET;
+            network = Network.DEVNET;
     }
 
     return new Aptos(new AptosConfig({ network }));

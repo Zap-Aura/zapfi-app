@@ -1,11 +1,9 @@
-import '@/shared/plugins/crypto';
-import { useStorageValues } from '@/hooks';
+import { useApp, useStorageValues } from '@/hooks';
 import { router, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useCallback, useEffect, useState } from 'react';
-import Storage from '@/shared/adapters/storage';
+import React, { useEffect } from 'react';
 import { UserInactivityProvider } from '@/providers';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../global.css';
@@ -14,7 +12,11 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
     const queryClient = new QueryClient();
-    const [shouldRenderApp, setShouldRenderApp] = useState<boolean>(false);
+    const address = useStorageValues((state) => state.address);
+    const pin = useStorageValues((state) => state.pin);
+    const isMounting = useApp((state) => state.isMounting);
+    const load = useApp((state) => state.load);
+    const isUnlocked = useApp((state) => state.isUnlocked);
 
     const [fontLoaded, fontError] = useFonts({
         'GeistMono-Black': require('../assets/fonts/Geist_Mono/static/GeistMono-Black.ttf'),
@@ -33,36 +35,34 @@ export default function RootLayout() {
     });
 
     useEffect(() => {
-        (async function () {
-            try {
-                const pairs = await new Storage().loadValues();
-                if (pairs) {
-                    useStorageValues.setState(pairs);
-                    if (pairs.address) router.push('/(auth)/lock');
-                }
-            } finally {
-                setShouldRenderApp(true);
-            }
-        })();
+        load();
     }, []);
 
-    const onLayoutRootView = useCallback(async () => {
-        if (shouldRenderApp) await SplashScreen.hideAsync();
-        if (fontLoaded || fontError) {
-        }
-    }, [fontLoaded, fontError, shouldRenderApp]);
+    useEffect(() => {
+        (async () => {
+            if (fontLoaded || fontError) {
+                if (!isMounting) {
+                    await SplashScreen.hideAsync();
+                    if (address && pin && !isUnlocked) router.replace('/(auth)/lock');
+                }
+            }
+        })();
+    }, [fontLoaded, fontError, address, pin, isMounting, isUnlocked]);
 
-    if (!shouldRenderApp) return null;
+    if ((!fontLoaded && !fontError) || isMounting) return null;
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
             <QueryClientProvider client={queryClient}>
                 <UserInactivityProvider>
                     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
                         <Stack.Screen name="(auth)" />
                         <Stack.Screen name="(onboard)" />
                         <Stack.Screen name="(tabs)" />
+                        <Stack.Screen name="(send)" />
+                        <Stack.Screen name="(settings)" />
                         <Stack.Screen name="index" />
+                        <Stack.Screen name="buy" />
                         <Stack.Screen name="receive" />
                         <Stack.Screen name="settings" />
                     </Stack>

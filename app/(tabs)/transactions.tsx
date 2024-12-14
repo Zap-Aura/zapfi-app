@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyResult } from '@/components';
@@ -7,9 +7,12 @@ import { useCustomInfiniteQuery, useStorageValues } from '@/hooks';
 import { TransactionResponse } from '@aptos-labs/ts-sdk';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { formatDate, truncateAddress } from '@/shared/uitls';
+import { Images } from '@/constants';
+import * as Linking from 'expo-linking';
 
 const Page = () => {
     const addr = useStorageValues((state) => state.address);
+    const network = useStorageValues((state) => state.network || 'devnet');
 
     const { data, fetchNextPage, hasNextPage, isLoading } = useCustomInfiniteQuery({
         key: 'transactions',
@@ -18,10 +21,12 @@ const Page = () => {
             const limit = 20;
             const offset = (pageParam - 1) * limit;
 
-            return await aptos.getAccountTransactions({
+            const txs = await aptos.getAccountTransactions({
                 accountAddress: addr,
                 options: { limit, offset },
             });
+
+            return txs;
         },
     });
 
@@ -31,16 +36,24 @@ const Page = () => {
 
     const renderTransactionItem = (transaction: TransactionResponse) => {
         if (transaction.type === 'user_transaction') {
-            const isOutgoing = transaction.sender === addr;
+            const hash = transaction.hash;
             const from = transaction.sender;
-            const to = (transaction.payload as any)?.arguments?.[0] || 'N/A';
+            const to = (transaction.payload as any)?.arguments?.[0];
             const amount = (transaction.payload as any)?.arguments?.[1] || 0;
-            const timestamp = new Date(Number(transaction.timestamp) / 1000).toLocaleString();
+            const timestamp = Math.round(Number(transaction.timestamp) / 1000);
+            const isOutgoing = transaction.sender === addr;
 
-            console.log(Math.ceil(Number(transaction.timestamp) / 1000));
+            console.log(transaction.payload);
 
             return (
-                <View className="flex-row items-center justify-between">
+                <TouchableOpacity
+                    onPress={() => {
+                        Linking.openURL(
+                            `https://explorer.aptoslabs.com/txn/${hash}?network=${network}`
+                        );
+                    }}
+                    className="flex-row items-center justify-between"
+                >
                     <View className="flex-row items-center gap-4">
                         <View className="bg-tertiary w-14 h-14 items-center justify-center rounded-full">
                             {isOutgoing ? (
@@ -66,13 +79,13 @@ const Page = () => {
 
                     <View>
                         <Text className="text-right text-gray-400 font-inter-regular mb-1.5">
-                            {1.05} APT
+                            {(amount / 10 ** 8).toFixed(2)} APT
                         </Text>
                         <Text className="text-right text-white font-geistmono-semi-bold">
-                            {formatDate(Math.round(Number(transaction.timestamp) / 1000), true)}
+                            {formatDate(timestamp, true)}
                         </Text>
                     </View>
-                </View>
+                </TouchableOpacity>
             );
         }
 
@@ -85,16 +98,23 @@ const Page = () => {
                 data={data?.pages.flatMap((page) => page)}
                 keyExtractor={(item) => item.hash}
                 ListHeaderComponent={
-                    <View className="py-4 mb-5">
+                    <View className="py-4 mb-5 flex-row items-center justify-center gap-3">
                         <Text className="text-white font-geistmono-bold text-2xl text-center">
                             Transactions
                         </Text>
+                        {isLoading ? (
+                            <Image
+                                source={Images.loading}
+                                resizeMode="contain"
+                                className="h-8 w-8"
+                            />
+                        ) : null}
                     </View>
                 }
                 ListEmptyComponent={isLoading ? null : <EmptyResult />}
                 onEndReached={loadMore}
                 onEndReachedThreshold={0.5}
-                ItemSeparatorComponent={() => <View className="py-9" />}
+                ItemSeparatorComponent={() => <View className="py-7" />}
                 renderItem={({ item }) => renderTransactionItem(item)}
             />
         </SafeAreaView>

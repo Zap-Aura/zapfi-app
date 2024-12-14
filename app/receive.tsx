@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import QRCode from 'react-native-qrcode-svg';
-import { Colors } from '@/constants';
+import { Colors, Images } from '@/constants';
 import * as Clipboard from 'expo-clipboard';
 import { useStorageValues } from '@/hooks';
 
@@ -46,11 +46,15 @@ const Page = () => {
                             size={width - 100}
                             backgroundColor={Colors.Background}
                             color={'#6b7280'}
-                            value={addr || '#'}
+                            logo={Images.icon}
+                            logoBorderRadius={99}
+                            logoSize={80}
+                            logoMargin={15}
+                            value={addr!}
                         />
                     </View>
 
-                    <View className="bg-yellow-800 flex-row items-center p-5 rounded-lg gap-4 mb-5">
+                    <View className="bg-primary flex-row items-center p-5 rounded-lg gap-4 mb-5">
                         <Ionicons name="information-circle-outline" size={24} color="#fff" />
                         <Text className="text-white text-base font-geistmono-regular w-[85%]">
                             Send only APTOS and APTOS tokens to this address

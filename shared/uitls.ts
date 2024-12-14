@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
 
-export const truncateAddress = (address: string, length = 6) => {
+export const truncateAddress = (address: string, length = 4) => {
     if (!address || address.length <= length * 2) return address;
     return `${address.slice(0, length)}...${address.slice(-length)}`;
 };

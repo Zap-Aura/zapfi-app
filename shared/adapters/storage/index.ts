@@ -14,6 +14,7 @@ export default class Storage {
             'isBalanceHidden',
             'pin',
             'appLastInactive',
+            'preferredBrowser',
         ];
     }
 
@@ -40,6 +41,14 @@ export default class Storage {
         try {
             await AsyncStorage.setItem(key, value);
             useStorageValues.setState({ [key]: value });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async clear() {
+        try {
+            await AsyncStorage.clear();
         } catch (e) {
             console.error(e);
         }

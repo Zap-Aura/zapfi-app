@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { GOOGLE_ANDROID_CLIENT_ID, GOOGLE_iOS_CLIENT_ID } from '@/shared/Env';
 import aptos from '@/shared/adapters/aptos';
-import { useStorageValues } from '@/hooks';
+import { useApp, useStorageValues } from '@/hooks';
 import Storage from '@/shared/adapters/storage';
 import { storeKeylessAccount } from '@/shared/keyless';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +26,7 @@ const Page = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [ephemeralKeyPair, setEphemeralKeyPair] = useState<EphemeralKeyPair>();
     const _currentEphemeralKeyPair = useStorageValues((state) => state.ephemeralKeyPair);
+    const load = useApp((state) => state.load);
 
     useEffect(() => {
         (async function () {
@@ -91,9 +92,10 @@ const Page = () => {
                         emailAddress: (payload as any).email,
                     }),
                     storeKeylessAccount(keylessAccount),
+                    load(keylessAccount.accountAddress.toString()),
                 ]);
 
-                router.push('/(onboard)');
+                router.replace('/(onboard)');
             }
         } catch (e: any) {
             Alert.alert(e.message || 'Unable to complete request!');

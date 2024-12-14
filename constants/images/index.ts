@@ -1,5 +1,6 @@
 //@ts-nocheck
 import aptos from '@/assets/images/aptos.png';
-import nft from '@/assets/images/nft.png';
+import icon from '@/assets/icon.png';
+import loading from '@/assets/images/loading.gif';
 
-export default { aptos, nft };
+export default { aptos, icon, loading };

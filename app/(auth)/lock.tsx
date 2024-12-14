@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { useStorageValues } from '@/hooks';
+import { useApp, useStorageValues } from '@/hooks';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated, {
     useAnimatedStyle,
@@ -14,6 +14,9 @@ import Animated, {
 } from 'react-native-reanimated';
 
 const Page = () => {
+    const clear = useStorageValues((state) => state.clear);
+    const unlock = useApp((state) => state.unlock);
+
     const [code, setCode] = useState<number[]>([]);
     const length = Array(4).fill(0);
 
@@ -35,6 +38,8 @@ const Page = () => {
             else {
                 const passcode = code.join('');
                 if (passcode === pin) {
+                    unlock();
+
                     router.push('/(tabs)/home');
                     setCode([]);
 
@@ -42,7 +47,8 @@ const Page = () => {
                 } else {
                     offset.value = withSequence(
                         withTiming(-OFFSET, { duration: TIME / 2 }),
-                        withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true)
+                        withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
+                        withTiming(0, { duration: TIME / 2 })
                     );
 
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -64,7 +70,19 @@ const Page = () => {
 
     return (
         <SafeAreaView className="bg-background h-full py-10 px-5 flex-col justify-between">
-            <Text className="text-white text-center font-geistmono-bold text-lg mt-10">
+            <View className="items-center justify-center absolute right-5 top-20">
+                <TouchableOpacity
+                    className="px-6 py-4 rounded-full"
+                    style={{ backgroundColor: '#283132' }}
+                    onPress={clear}
+                >
+                    <Text className="font-geistmono-semi-bold text-white text-[15px]">
+                        Log out?
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
+            <Text className="text-white text-center font-geistmono-bold text-lg mt-28">
                 Enter 4-digit Passcode
             </Text>
 

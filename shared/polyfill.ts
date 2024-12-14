@@ -7,10 +7,7 @@ const cryptoPolyfill = {
         }
 
         const randomBytes = Crypto.getRandomBytes(array.length);
-
-        for (let i = 0; i < randomBytes.length; i++) {
-            array[i] = randomBytes[i];
-        }
+        array.set(randomBytes);
 
         return array;
     },
@@ -25,3 +22,5 @@ const cryptoPolyfill = {
 };
 
 if (typeof global.crypto === 'undefined') global.crypto = cryptoPolyfill as Crypto;
+
+export {};

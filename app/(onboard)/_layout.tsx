@@ -4,7 +4,7 @@ import { useStorageValues } from '@/hooks';
 
 const OnboardLayout = () => {
     useEffect(() => {
-        // if (!useStorageValues.getState().address) return router.push('/');
+        if (!useStorageValues.getState().address) return router.push('/');
     }, []);
 
     return (
