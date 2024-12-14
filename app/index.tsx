@@ -107,7 +107,7 @@ const Page = () => {
 
     return (
         <SafeAreaView className="bg-background flex-1 items-center justify-between py-3">
-            <View className="flex w-full px-5 h-[80vh] items-center justify-center">
+            <View className="flex w-full px-5 h-[80vh] android:h-[75vh] items-center justify-center">
                 <View className="mb-10">
                     <Logo />
                 </View>
