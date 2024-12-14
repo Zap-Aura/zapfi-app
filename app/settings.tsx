@@ -10,7 +10,7 @@ import * as Linking from 'expo-linking';
 const Page = () => {
     const emailAddress = useStorageValues((state) => state.emailAddress);
     const address = useStorageValues((state) => state.address);
-    const network = useStorageValues((state) => state.network);
+    const network = useStorageValues((state) => state.network || 'devnet');
     const clear = useStorageValues((state) => state.clear);
 
     function maskEmail(email: string) {
@@ -59,20 +59,6 @@ const Page = () => {
                             <Ionicons name="git-network-outline" size={24} color="#fff" />
                             <Text className="font-geistmono-semi-bold text-[15px] text-gray-300">
                                 Network
-                            </Text>
-                        </View>
-
-                        <Ionicons name="chevron-forward-outline" size={18} color="#fff" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => router.push('/(settings)/security')}
-                        className="flex flex-row items-center justify-between"
-                    >
-                        <View className="flex flex-row items-center gap-5">
-                            <Ionicons name="lock-closed-outline" size={24} color="#fff" />
-                            <Text className="font-geistmono-semi-bold text-[15px] text-gray-300">
-                                Security
                             </Text>
                         </View>
 

@@ -43,8 +43,6 @@ const Page = () => {
             const timestamp = Math.round(Number(transaction.timestamp) / 1000);
             const isOutgoing = transaction.sender === addr;
 
-            console.log(transaction.payload);
-
             return (
                 <TouchableOpacity
                     onPress={() => {

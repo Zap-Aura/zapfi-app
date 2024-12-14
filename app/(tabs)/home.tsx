@@ -107,11 +107,11 @@ const Page = () => {
                 </View>
 
                 <View className="rounded-lg p-6 bg-[#283132] mb-4">
-                    {coins?.map(({ item }, idx) => (
+                    {coins?.map((item, idx) => (
                         <View
                             key={item.storage_id}
                             className={`flex-row items-center justify-between w-full ${
-                                idx === coins.length - 1 ? 'mb-[18px]' : 'mb-0'
+                                idx === coins.length - 1 ? 'mb-0' : 'mb-[34px]'
                             }`}
                         >
                             <View className="flex-row items-center gap-4">

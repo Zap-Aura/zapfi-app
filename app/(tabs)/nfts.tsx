@@ -11,7 +11,7 @@ import { Images } from '@/constants';
 
 const Page = () => {
     const addr = useStorageValues((state) => state.address);
-    const network = useStorageValues((state) => state.network || 'testnet');
+    const network = useStorageValues((state) => state.network || 'devnet');
 
     const { data, isLoading } = useQuery({
         queryKey: ['nfts', addr],

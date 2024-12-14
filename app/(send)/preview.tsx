@@ -16,7 +16,7 @@ const Page = () => {
     const coins = useApp((state) => state.coins);
     const load = useApp((state) => state.load);
 
-    const network = useStorageValues((state) => state.network);
+    const network = useStorageValues((state) => state.network || 'devnet');
     const myAddress = useStorageValues((state) => state.address);
 
     useEffect(() => {
