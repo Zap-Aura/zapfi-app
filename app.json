@@ -31,6 +31,7 @@
         },
         "plugins": [
             "expo-router",
+            "./translucent-default-splash-screen-config",
             [
                 "expo-splash-screen",
                 {

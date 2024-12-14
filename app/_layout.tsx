@@ -43,6 +43,7 @@ export default function RootLayout() {
             if (fontLoaded || fontError) {
                 if (!isMounting) {
                     await SplashScreen.hideAsync();
+                    if (address && !pin) router.replace('/(onboard)');
                     if (address && pin && !isUnlocked) router.replace('/(auth)/lock');
                 }
             }

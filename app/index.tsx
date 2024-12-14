@@ -1,4 +1,4 @@
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { EphemeralKeyPair } from '@aptos-labs/ts-sdk';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -15,10 +15,10 @@ import { useApp, useStorageValues } from '@/hooks';
 import Storage from '@/shared/adapters/storage';
 import { storeKeylessAccount } from '@/shared/keyless';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Entypo from '@expo/vector-icons/Entypo';
 import { Logo } from '@/components';
-import { Colors } from '@/constants';
+import { Colors, Images } from '@/constants';
 import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -121,12 +121,19 @@ const Page = () => {
                     className="w-full flex flex-row items-center justify-center border border-gray-600 rounded-full py-7 gap-3"
                 >
                     {isLoading ? (
-                        <Text className="text-white font-geistmono-regular text-[17px]">
-                            Loading...
-                        </Text>
+                        <View className="flex-row items-center gap-4">
+                            <Text className="text-white font-geistmono-semi-bold text-[17px]">
+                                Loading
+                            </Text>
+                            <Image
+                                source={Images.loading}
+                                resizeMode="contain"
+                                className="h-8 w-8"
+                            />
+                        </View>
                     ) : (
                         <>
-                            <Entypo name="google-" size={22} color={Colors.Tertiary} />
+                            <Ionicons name="logo-google" size={22} color={Colors.Tertiary} />
                             <Text className="text-white font-geistmono-regular text-[17px]">
                                 Continue with Google
                             </Text>
